@@ -138,7 +138,7 @@ GEMINI_API_KEY=your_actual_gemini_key_here
 
 ### Step 5: Run the Streamlit Application
 ```bash
-streamlit run app.py
+streamlit run streamlit_app.py
 ```
 Streamlit will launch automatically in your browser at:
 `http://localhost:8501`
@@ -208,7 +208,7 @@ Try these queries in the search bar or click the prompt chips:
 | Issue | Cause | Solution |
 | :--- | :--- | :--- |
 | `ModuleNotFoundError: No module named 'streamlit'` | Virtual environment not active | Run `source venv/bin/activate` before starting the app. |
-| `Port 8501 is already in use` | Another Streamlit process is running | Run `streamlit run app.py --server.port 8502` to use another port. |
+| `Port 8501 is already in use` | Another Streamlit process is running | Run `streamlit run streamlit_app.py --server.port 8502` to use another port. |
 | `TMDB API warning: HTTP 401` | Invalid TMDB API key in `.env` | Check `.env` or leave empty to use offline Demo Mode. |
 | `Watchlist not saving` | SQLite folder permission | Ensure `data/` folder exists and is writable. |
 
