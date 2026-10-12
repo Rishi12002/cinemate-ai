@@ -1,0 +1,26 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Environments
+venv/
+env/
+ENV/
+.venv/
+
+# Environment secrets
+.env
+*.env
+
+# SQLite local database
+*.db
+watchlist.db
+data/watchlist.db
+tests/test_watchlist.db
+
+# OS files
+.DS_Store
+Thumbs.db
