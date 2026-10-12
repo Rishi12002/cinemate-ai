@@ -4,418 +4,399 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CineMate AI — Movie & Web Series Recommendations</title>
-  <meta name="description" content="AI-powered movie and web series recommendation agent. Discover your next obsession based on mood, plot twists, and personal taste.">
+  <meta name="description" content="AI movie and web series recommendation agent.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-primary: #0b0f17;
-      --bg-secondary: #131926;
-      --bg-card: rgba(19, 25, 38, 0.85);
+      --bg-app: #0b0f17;
+      --bg-sidebar: #0f1420;
+      --bg-card: #131926;
       --border-color: #1e293b;
-      --border-hover: #6366f1;
       --primary: #6366f1;
       --primary-hover: #4f46e5;
       --accent: #8b5cf6;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
-      --radius-sm: 8px;
-      --radius-md: 14px;
-      --radius-lg: 20px;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: var(--bg-primary);
+      background-color: var(--bg-app);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.10) 0px, transparent 50%);
       color: var(--text-main);
       min-height: 100vh;
-      line-height: 1.5;
-      background-image: 
-        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.14) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.12) 0px, transparent 50%);
-      background-attachment: fixed;
-    }
-
-    /* Container */
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem 1.5rem;
-    }
-
-    /* Navigation / Header */
-    header {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2.5rem;
-      padding-bottom: 1.25rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    .brand {
+    /* Layout: Sidebar + Main Content (Exact Streamlit Layout) */
+    .app-layout {
       display: flex;
-      align-items: center;
-      gap: 12px;
+      width: 100%;
+      min-height: 100vh;
     }
 
-    .brand-icon {
-      font-size: 2rem;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      padding: 6px 10px;
-      border-radius: 12px;
-      display: inline-block;
+    /* Streamlit Sidebar Style */
+    .sidebar {
+      width: 320px;
+      min-width: 320px;
+      background-color: var(--bg-sidebar);
+      border-right: 1px solid var(--border-color);
+      padding: 1.5rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      overflow-y: auto;
+      height: 100vh;
+      position: sticky;
+      top: 0;
     }
 
-    .brand-title {
+    .sidebar-title {
       font-family: 'Outfit', sans-serif;
-      font-size: 1.85rem;
+      font-size: 1.2rem;
       font-weight: 700;
-      background: linear-gradient(135deg, #ffffff 40%, #a5b4fc 80%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: -0.02em;
+      color: #fff;
     }
 
-    .brand-tagline {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 5px 12px;
-      border-radius: 9999px;
+    .sidebar-caption {
       font-size: 0.8rem;
-      font-weight: 500;
+      color: var(--text-muted);
+      margin-top: -8px;
+      line-height: 1.35;
     }
 
-    .status-badge.demo {
-      background: rgba(168, 85, 247, 0.15);
-      border: 1px solid rgba(168, 85, 247, 0.35);
-      color: #c084fc;
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     }
 
-    .status-badge.live {
-      background: rgba(34, 197, 94, 0.15);
-      border: 1px solid rgba(34, 197, 94, 0.35);
-      color: #4ade80;
+    .filter-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #e2e8f0;
     }
 
-    .btn-watchlist-toggle {
-      background: #1e293b;
-      color: #f1f5f9;
-      border: 1px solid #334155;
-      padding: 8px 16px;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      font-weight: 500;
-      font-size: 0.9rem;
+    /* Custom Radio Buttons */
+    .radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.85rem;
+    }
+
+    .radio-label {
       display: flex;
       align-items: center;
       gap: 8px;
+      cursor: pointer;
+      color: #cbd5e1;
+    }
+
+    .radio-label input[type="radio"] {
+      accent-color: var(--primary);
+    }
+
+    /* Genre Selector */
+    .genre-select {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #e2e8f0;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      width: 100%;
+      outline: none;
+    }
+
+    /* Sliders */
+    .slider-container {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .btn-reset-taste {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #cbd5e1;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 100%;
+      text-align: center;
+    }
+
+    .btn-reset-taste:hover {
+      background: #273549;
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .status-pill-demo {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(168, 85, 247, 0.15);
+      border: 1px solid rgba(168, 85, 247, 0.35);
+      color: #c084fc;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.78rem;
+      font-weight: 500;
+    }
+
+    .status-pill-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid rgba(34, 197, 94, 0.35);
+      color: #4ade80;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.78rem;
+      font-weight: 500;
+    }
+
+    /* Main Section */
+    .main-content {
+      flex: 1;
+      padding: 2rem 2.5rem;
+      overflow-y: auto;
+      max-width: 1200px;
+    }
+
+    /* Streamlit Tabs */
+    .tabs-header {
+      display: flex;
+      gap: 1.5rem;
+      border-bottom: 1px solid #1e293b;
+      margin-bottom: 2rem;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 8px 4px 12px 4px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
       transition: all 0.2s;
     }
 
-    .btn-watchlist-toggle:hover {
-      background: #273549;
-      border-color: #6366f1;
+    .tab-btn.active {
+      color: #fff;
+      border-bottom-color: var(--primary);
     }
 
-    .watchlist-badge-count {
-      background: var(--primary);
-      color: white;
-      font-size: 0.75rem;
-      padding: 2px 7px;
-      border-radius: 10px;
-    }
-
-    /* Hero Search Section */
-    .hero {
-      text-align: center;
-      margin-bottom: 2.5rem;
-    }
-
-    .hero h1 {
+    /* Hero */
+    .hero-title {
       font-family: 'Outfit', sans-serif;
       font-size: 2.8rem;
-      font-weight: 800;
-      margin-bottom: 0.5rem;
-      background: linear-gradient(135deg, #ffffff 40%, #c7d2fe 80%, #818cf8 100%);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #ffffff 30%, #a5b4fc 70%, #818cf8 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      letter-spacing: -0.02em;
+      margin-bottom: 0.2rem;
     }
 
-    .hero p {
+    .hero-tagline {
       font-size: 1.15rem;
       color: var(--text-muted);
-      max-width: 650px;
-      margin: 0 auto 1.8rem auto;
+      margin-bottom: 1.25rem;
     }
 
-    /* Search Box */
-    .search-container {
-      max-width: 760px;
-      margin: 0 auto;
-      position: relative;
+    /* Memory Chips */
+    .taste-chip {
+      display: inline-flex;
+      align-items: center;
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #cbd5e1;
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      border-radius: 16px;
+      margin-right: 6px;
+      margin-bottom: 6px;
     }
 
-    .search-input-wrapper {
+    /* 3-Column Prompt Buttons */
+    .prompt-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 1.25rem 0 2rem 0;
+    }
+
+    .btn-prompt {
+      background: #131926;
+      border: 1px solid #1e293b;
+      color: #cbd5e1;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s ease;
+      line-height: 1.35;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-prompt:hover {
+      background: #1e293b;
+      border-color: var(--primary);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    /* Chat Input Bar (like st.chat_input) */
+    .chat-input-bar {
       display: flex;
       align-items: center;
       background: #131926;
       border: 1.5px solid #1e293b;
-      border-radius: var(--radius-lg);
-      padding: 6px 8px 6px 18px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-      transition: all 0.25s ease;
+      border-radius: 10px;
+      padding: 6px 12px;
+      margin-bottom: 2rem;
+      transition: border-color 0.2s;
     }
 
-    .search-input-wrapper:focus-within {
+    .chat-input-bar:focus-within {
       border-color: var(--primary);
-      box-shadow: 0 8px 35px rgba(99, 102, 241, 0.25);
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
     }
 
-    .search-input {
+    .chat-input-field {
       flex: 1;
       background: transparent;
       border: none;
       color: #fff;
-      font-size: 1.05rem;
+      font-size: 0.95rem;
       outline: none;
-      padding: 10px 0;
+      padding: 8px 4px;
       font-family: inherit;
     }
 
-    .search-input::placeholder {
-      color: #64748b;
-    }
-
-    .btn-search {
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      color: #fff;
+    .btn-send {
+      background: var(--primary);
       border: none;
-      padding: 12px 24px;
-      border-radius: 14px;
+      color: white;
+      padding: 7px 14px;
+      border-radius: 6px;
+      cursor: pointer;
       font-weight: 600;
-      font-size: 0.95rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: opacity 0.2s;
+      font-size: 0.85rem;
     }
 
-    .btn-search:hover {
-      opacity: 0.92;
+    .btn-send:hover {
+      background: var(--primary-hover);
     }
 
-    /* Prompt Chips */
-    .quick-prompts {
-      margin-top: 1.25rem;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .prompt-chip {
-      background: rgba(30, 41, 59, 0.6);
-      border: 1px solid #334155;
-      color: #cbd5e1;
-      font-size: 0.82rem;
-      padding: 6px 13px;
-      border-radius: 20px;
-      cursor: pointer;
-      transition: all 0.2s;
-      user-select: none;
-    }
-
-    .prompt-chip:hover {
-      background: rgba(99, 102, 241, 0.2);
-      border-color: var(--primary);
-      color: #fff;
-      transform: translateY(-1px);
-    }
-
-    /* Active Memory Box */
-    .memory-box {
-      max-width: 760px;
-      margin: 1.5rem auto 0 auto;
-      background: rgba(19, 25, 38, 0.6);
-      border: 1px solid #1e293b;
-      border-radius: var(--radius-md);
-      padding: 0.85rem 1.2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .memory-title {
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .memory-chips-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .taste-pill {
-      background: #1e293b;
-      border: 1px solid #334155;
-      color: #a5b4fc;
-      font-size: 0.78rem;
-      padding: 3px 9px;
-      border-radius: 12px;
-      font-weight: 500;
-    }
-
-    .btn-reset-memory {
-      background: transparent;
-      border: 1px solid #475569;
-      color: #94a3b8;
-      font-size: 0.78rem;
-      padding: 3px 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .btn-reset-memory:hover {
-      color: #f8fafc;
-      border-color: #cbd5e1;
-    }
-
-    /* Section Header */
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 2.5rem 0 1.25rem 0;
-    }
-
-    .section-title {
-      font-family: 'Outfit', sans-serif;
-      font-size: 1.5rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* Results Grid */
-    .grid {
+    /* Cards Grid (3 Columns) */
+    .cards-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 1.5rem;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      margin-bottom: 2rem;
     }
 
-    /* Card */
-    .card {
+    .movie-card {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
+      border-radius: 14px;
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+      height: 100%;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s ease, border-color 0.2s ease;
     }
 
-    .card:hover {
+    .movie-card:hover {
       transform: translateY(-4px);
-      border-color: var(--border-hover);
-      box-shadow: 0 10px 30px rgba(99, 102, 241, 0.15);
-    }
-
-    .poster-container {
-      width: 100%;
-      height: 360px;
-      background: #0f172a;
-      overflow: hidden;
-      position: relative;
+      border-color: var(--primary);
     }
 
     .poster-img {
       width: 100%;
-      height: 100%;
+      height: 320px;
       object-fit: cover;
-      transition: transform 0.3s;
+      background: #0f172a;
     }
 
-    .card:hover .poster-img {
-      transform: scale(1.02);
-    }
-
-    .poster-fallback {
-      width: 100%;
-      height: 100%;
+    .poster-placeholder {
+      height: 320px;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, #1e293b, #0f172a);
       color: #64748b;
-      padding: 1.5rem;
+      padding: 1rem;
       text-align: center;
     }
 
-    .card-body {
-      padding: 1.2rem;
+    .card-content {
+      padding: 1.1rem;
       display: flex;
       flex-direction: column;
-      flex: 1;
+      flex-grow: 1;
     }
 
     .card-title {
       font-family: 'Outfit', sans-serif;
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: #fff;
-      margin-bottom: 0.4rem;
-      line-height: 1.3;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #f8fafc;
+      margin-bottom: 0.35rem;
     }
 
     .card-meta {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--text-muted);
       margin-bottom: 0.65rem;
     }
 
     .badge-type {
       background: #27272a;
-      color: #f4f4f5;
+      color: #e4e4e7;
       padding: 2px 7px;
-      border-radius: 4px;
+      border-radius: 5px;
       font-weight: 600;
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       text-transform: uppercase;
     }
 
@@ -423,7 +404,7 @@
       background: rgba(234, 179, 8, 0.15);
       color: #facc15;
       padding: 2px 7px;
-      border-radius: 4px;
+      border-radius: 5px;
       font-weight: 600;
       font-size: 0.75rem;
     }
@@ -432,24 +413,20 @@
       background: rgba(99, 102, 241, 0.2);
       color: #818cf8;
       padding: 2px 7px;
-      border-radius: 4px;
+      border-radius: 5px;
       font-weight: 600;
       font-size: 0.75rem;
     }
 
-    .genre-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-      margin-bottom: 0.75rem;
-    }
-
-    .genre-pill {
+    .genre-chip {
+      display: inline-block;
       background: #1e293b;
       color: #cbd5e1;
       font-size: 0.72rem;
       padding: 2px 8px;
       border-radius: 12px;
+      margin-right: 4px;
+      margin-bottom: 4px;
     }
 
     .card-overview {
@@ -466,433 +443,488 @@
     .why-match-box {
       background: rgba(99, 102, 241, 0.08);
       border-left: 3px solid var(--primary);
-      padding: 0.65rem 0.85rem;
-      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 0.65rem 0.8rem;
+      border-radius: 0 8px 8px 0;
       font-size: 0.82rem;
       color: #c7d2fe;
       margin-top: auto;
-      margin-bottom: 0.95rem;
+      margin-bottom: 0.85rem;
       line-height: 1.4;
     }
 
-    .card-footer {
+    .card-actions {
       display: flex;
       gap: 8px;
+      margin-bottom: 0.75rem;
     }
 
-    .btn-card {
+    .btn-action {
       flex: 1;
-      padding: 8px 12px;
-      border-radius: var(--radius-sm);
-      font-size: 0.85rem;
-      font-weight: 600;
+      padding: 7px 10px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 500;
       cursor: pointer;
       text-align: center;
-      transition: all 0.2s;
-      border: none;
       text-decoration: none;
+      border: 1px solid transparent;
+      transition: all 0.2s;
     }
 
-    .btn-card-watchlist {
+    .btn-watch {
       background: #1e293b;
-      color: #f8fafc;
-      border: 1px solid #334155;
+      color: #f1f5f9;
+      border-color: #334155;
     }
 
-    .btn-card-watchlist:hover {
+    .btn-watch:hover {
       background: #273549;
       border-color: var(--primary);
     }
 
-    .btn-card-watchlist.active {
+    .btn-watch.active {
       background: rgba(34, 197, 94, 0.15);
       border-color: rgba(34, 197, 94, 0.4);
       color: #4ade80;
     }
 
-    .btn-card-tmdb {
+    .btn-tmdb {
       background: rgba(255, 255, 255, 0.06);
       color: #cbd5e1;
     }
 
-    .btn-card-tmdb:hover {
+    .btn-tmdb:hover {
       background: rgba(255, 255, 255, 0.12);
       color: #fff;
     }
 
-    /* Watchlist Drawer / Modal */
-    .drawer-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(4px);
-      z-index: 100;
-      display: none;
-    }
-
-    .drawer {
-      position: fixed;
-      top: 0;
-      right: -480px;
-      width: 100%;
-      max-width: 460px;
-      height: 100%;
+    /* Streamlit Expander Style */
+    .expander {
+      border: 1px solid #1e293b;
+      border-radius: 6px;
+      overflow: hidden;
       background: #0f1420;
-      border-left: 1px solid var(--border-color);
-      z-index: 101;
-      transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .expander-header {
+      padding: 7px 10px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      cursor: pointer;
       display: flex;
-      flex-direction: column;
-      box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
+      justify-content: space-between;
+      user-select: none;
     }
 
-    .drawer.open {
-      right: 0;
+    .expander-header:hover {
+      color: #fff;
     }
 
-    .drawer-overlay.open {
+    .expander-body {
+      padding: 8px 10px;
+      border-top: 1px solid #1e293b;
+      display: none;
+      font-size: 0.78rem;
+    }
+
+    .expander.open .expander-body {
       display: block;
     }
 
-    .drawer-header {
-      padding: 1.25rem 1.5rem;
-      border-bottom: 1px solid var(--border-color);
+    /* Watchlist Tab View */
+    .watchlist-list {
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 1rem;
+    }
+
+    .watchlist-row {
+      display: flex;
+      gap: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px 16px;
       align-items: center;
     }
 
-    .drawer-title {
-      font-family: 'Outfit', sans-serif;
-      font-size: 1.25rem;
-      font-weight: 700;
-    }
-
-    .btn-close-drawer {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-size: 1.4rem;
-      cursor: pointer;
-    }
-
-    .drawer-content {
-      padding: 1.25rem 1.5rem;
-      overflow-y: auto;
-      flex: 1;
-    }
-
-    .watchlist-item {
-      display: flex;
-      gap: 12px;
-      padding: 12px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    }
-
-    .watchlist-thumb {
+    .watchlist-row img {
       width: 60px;
       height: 85px;
       object-fit: cover;
       border-radius: 6px;
-      background: #1e293b;
     }
 
-    .watchlist-item-info {
+    .watchlist-details {
       flex: 1;
     }
 
-    .watchlist-item-title {
-      font-weight: 600;
-      font-size: 0.95rem;
-      margin-bottom: 2px;
-    }
-
-    .watchlist-item-meta {
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-    }
-
-    .btn-remove-watch {
+    .btn-remove-row {
       background: none;
-      border: none;
+      border: 1px solid #ef4444;
       color: #ef4444;
-      font-size: 0.78rem;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
       cursor: pointer;
-      padding: 0;
     }
 
-    .btn-remove-watch:hover {
-      text-decoration: underline;
+    .btn-remove-row:hover {
+      background: #ef4444;
+      color: white;
     }
 
-    /* Loading Spinner */
-    .spinner-container {
+    /* Spinner */
+    .spinner-box {
       display: none;
       text-align: center;
-      padding: 3rem 0;
+      padding: 2rem 0;
+      color: var(--text-muted);
     }
 
     .spinner {
-      width: 44px;
-      height: 44px;
-      border: 3.5px solid rgba(99, 102, 241, 0.2);
+      width: 36px;
+      height: 36px;
+      border: 3px solid rgba(99, 102, 241, 0.2);
       border-top-color: var(--primary);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
-      margin: 0 auto 1rem auto;
+      margin: 0 auto 0.75rem auto;
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Notice Box */
-    .alert-notice {
-      background: rgba(99, 102, 241, 0.12);
-      border: 1px solid rgba(99, 102, 241, 0.3);
-      color: #c7d2fe;
-      padding: 0.85rem 1.25rem;
-      border-radius: var(--radius-sm);
-      margin-bottom: 1.5rem;
-      font-size: 0.9rem;
-    }
-
-    /* Empty state */
-    .empty-state {
-      text-align: center;
-      padding: 3.5rem 1.5rem;
-      background: rgba(19, 25, 38, 0.5);
-      border: 1px dashed var(--border-color);
-      border-radius: var(--radius-md);
-      margin-top: 1.5rem;
-    }
-
-    .empty-state h3 {
-      font-family: 'Outfit', sans-serif;
-      font-size: 1.4rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .empty-state p {
-      color: var(--text-muted);
-      max-width: 500px;
-      margin: 0 auto;
-      font-size: 0.95rem;
+    /* Responsive */
+    @media (max-width: 900px) {
+      .app-layout { flex-direction: column; }
+      .sidebar { width: 100%; min-width: 100%; height: auto; position: static; }
+      .prompt-grid { grid-template-columns: 1fr; }
+      .cards-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <!-- Header -->
-    <header>
-      <div class="brand">
-        <div class="brand-icon">🎬</div>
-        <div>
-          <div class="brand-title">CineMate AI</div>
-          <div class="brand-tagline">Your taste. Your next obsession.</div>
+  <div class="app-layout">
+    <!-- Streamlit Left Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-title">🎛️ Taste & Search Filters</div>
+      <div class="sidebar-caption">Filters interact seamlessly with your conversational queries.</div>
+
+      <!-- Content Type Radio -->
+      <div class="filter-group">
+        <label class="filter-label">Content Type</label>
+        <div class="radio-group">
+          <label class="radio-label">
+            <input type="radio" name="contentType" value="both" checked> Both
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="contentType" value="movie"> Movies Only
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="contentType" value="tv"> TV Series Only
+          </label>
         </div>
       </div>
-      <div class="header-actions">
-        <div id="statusBadge" class="status-badge demo">🟣 Demo Mode</div>
-        <button id="openWatchlistBtn" class="btn-watchlist-toggle">
-          🔖 Watchlist <span id="watchlistCountBadge" class="watchlist-badge-count">0</span>
-        </button>
+
+      <!-- Genres Selector -->
+      <div class="filter-group">
+        <label class="filter-label">Preferred Genre</label>
+        <select id="genreSelect" class="genre-select">
+          <option value="">All Genres</option>
+          <option value="Action">Action</option>
+          <option value="Adventure">Adventure</option>
+          <option value="Animation">Animation</option>
+          <option value="Comedy">Comedy</option>
+          <option value="Crime">Crime</option>
+          <option value="Drama">Drama</option>
+          <option value="Horror">Horror</option>
+          <option value="Mystery">Mystery</option>
+          <option value="Romance">Romance</option>
+          <option value="Science Fiction">Science Fiction</option>
+          <option value="Thriller">Thriller</option>
+        </select>
       </div>
-    </header>
 
-    <!-- Hero Search -->
-    <section class="hero">
-      <h1>Discover Cinematic Obsessions</h1>
-      <p>Natural-language recommendations crafted around your mood, viewing constraints, and taste profile.</p>
-
-      <div class="search-container">
-        <div class="search-input-wrapper">
-          <input 
-            type="text" 
-            id="searchInput" 
-            class="search-input" 
-            placeholder="E.g. Mind-bending sci-fi with twist endings, or like Shutter Island..."
-            autocomplete="off"
-          />
-          <button id="searchBtn" class="btn-search">
-            <span>Discover</span> ➔
-          </button>
+      <!-- Minimum Rating Slider -->
+      <div class="filter-group slider-container">
+        <div class="slider-header">
+          <label class="filter-label">Minimum TMDB Rating</label>
+          <span id="ratingVal">6.5</span>
         </div>
+        <input type="range" id="ratingSlider" min="0" max="9.5" step="0.5" value="6.5">
+      </div>
 
-        <div class="quick-prompts">
-          <span class="prompt-chip" data-query="Recommend mind-bending sci-fi movies with unexpected endings.">🌌 Mind-bending sci-fi</span>
-          <span class="prompt-chip" data-query="I want a psychological thriller like Shutter Island.">🕵️ Like Shutter Island</span>
-          <span class="prompt-chip" data-query="Suggest Indian web series with suspense and strong storytelling.">🇮🇳 Indian Suspense Series</span>
-          <span class="prompt-chip" data-query="Recommend romantic movies that are emotional but have a happy ending.">❤️ Emotional Romance</span>
-          <span class="prompt-chip" data-query="Give me the best horror movies without too much gore.">🤫 Horror without gore</span>
-          <span class="prompt-chip" data-query="Recommend something funny for a bad day.">😄 Comfort comedy</span>
-          <span class="prompt-chip" data-query="Find English sci-fi movies released after 2020.">🚀 Sci-fi 2020+</span>
-          <span class="prompt-chip" data-query="Suggest a series with short episodes that I can finish this weekend.">🍿 Weekend Binge</span>
+      <!-- Release Year Slider -->
+      <div class="filter-group slider-container">
+        <div class="slider-header">
+          <label class="filter-label">Min Release Year</label>
+          <span id="yearVal">1990</span>
         </div>
+        <input type="range" id="yearSlider" min="1980" max="2026" step="1" value="1990">
+      </div>
 
-        <!-- Active Context Memory -->
-        <div id="memoryBox" class="memory-box" style="display: none;">
-          <div>
-            <div class="memory-title">Active Context Memory</div>
-            <div id="memoryChips" class="memory-chips-container"></div>
+      <!-- Max Runtime Slider -->
+      <div class="filter-group slider-container">
+        <div class="slider-header">
+          <label class="filter-label">Max Movie Runtime</label>
+          <span id="runtimeVal">180m</span>
+        </div>
+        <input type="range" id="runtimeSlider" min="60" max="240" step="15" value="180">
+      </div>
+
+      <!-- Reset Profile Button -->
+      <button id="resetProfileBtn" class="btn-reset-taste">🔄 Reset Taste Profile</button>
+
+      <hr style="border: none; border-top: 1px solid #1e293b; margin: 0.5rem 0;">
+
+      <!-- System Status Info -->
+      <div class="filter-group">
+        <label class="filter-label" style="font-size:0.8rem; text-transform:uppercase; color:#94a3b8;">⚡ System Status</label>
+        <div id="statusBadge" class="status-pill-demo">🟣 Demo Mode (Curated Catalogue)</div>
+        <div style="font-size:0.75rem; color:#64748b; line-height:1.35; margin-top:4px;">
+          Using verified 45+ title catalogue spanning Hollywood, Indian Cinema, K-Dramas & Anime.
+        </div>
+      </div>
+
+      <div style="font-size:0.82rem; color:#cbd5e1; margin-top:auto;">
+        📌 <strong>Saved in Watchlist:</strong> <span id="sideWatchCount">0</span> titles
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Tabs (Exact Streamlit Tabs) -->
+      <div class="tabs-header">
+        <button id="tabDiscoverBtn" class="tab-btn active">✨ Discover & Recommend</button>
+        <button id="tabWatchlistBtn" class="tab-btn">🔖 Watchlist (<span id="tabWatchCount">0</span>)</button>
+      </div>
+
+      <!-- Discover Tab View -->
+      <div id="discoverView">
+        <h1 class="hero-title">CineMate AI</h1>
+        <div class="hero-tagline">Your taste. Your next obsession.</div>
+
+        <!-- Active Context Memory Chips -->
+        <div id="memoryProfileSection" style="margin-bottom: 1.25rem; display: none;">
+          <div style="font-size: 0.85rem; font-weight: 600; color: #e2e8f0; margin-bottom: 6px;">Active Memory Profile:</div>
+          <div id="memoryChipsList"></div>
+          <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 4px;">
+            CineMate retains your established preferences across follow-up queries (e.g. <em>'Only Indian ones'</em> or <em>'Released after 2020'</em>).
           </div>
-          <button id="resetMemoryBtn" class="btn-reset-memory">Reset Memory</button>
+        </div>
+
+        <!-- Prompt Suggestions (3 Columns, Exact Streamlit) -->
+        <div style="font-size: 0.88rem; color: #cbd5e1; margin-top: 1rem;">💡 <strong>Try asking or click a prompt:</strong></div>
+        <div class="prompt-grid">
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <button class="btn-prompt" data-q="Recommend mind-bending sci-fi movies with unexpected endings.">🌌 Mind-bending sci-fi with twist endings</button>
+            <button class="btn-prompt" data-q="I want a psychological thriller like Shutter Island.">🕵️ Psychological thriller like Shutter Island</button>
+            <button class="btn-prompt" data-q="Find English sci-fi movies released after 2020.">⚡ English sci-fi released after 2020</button>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <button class="btn-prompt" data-q="Suggest Indian web series with suspense and strong storytelling.">🎭 Indian crime web series with suspense</button>
+            <button class="btn-prompt" data-q="Recommend romantic movies that are emotional but have a happy ending.">❤️ Emotional romance with happy ending</button>
+            <button class="btn-prompt" data-q="Suggest a series with short episodes that I can finish this weekend.">🍿 Short series to binge this weekend</button>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <button class="btn-prompt" data-q="Give me the best horror movies without too much gore.">🤫 Great horror without too much gore</button>
+            <button class="btn-prompt" data-q="Recommend something funny for a bad day.">😄 Something funny for a bad day</button>
+            <button class="btn-prompt" data-q="Recommend movies similar to Interstellar, Inception, or The Prestige.">🪐 Similar to Interstellar & Inception</button>
+          </div>
+        </div>
+
+        <!-- Conversational Search Bar (Like st.chat_input) -->
+        <div class="chat-input-bar">
+          <input type="text" id="chatInput" class="chat-input-field" placeholder="Ask CineMate AI (e.g. 'Recommend 5 psychological thrillers', 'Only Indian ones', etc.)...">
+          <button id="sendBtn" class="btn-send">Search</button>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div id="spinner" class="spinner-box">
+          <div class="spinner"></div>
+          <div>Analyzing request and ranking recommendations...</div>
+        </div>
+
+        <!-- Recommendations Grid -->
+        <div id="recommendationsSection" style="display: none;">
+          <h3 id="recommendationsHeading" style="font-family:'Outfit', sans-serif; font-size:1.4rem; margin-bottom: 1rem;">🎯 Top Recommendations</h3>
+          <div id="cardsGrid" class="cards-grid"></div>
+        </div>
+
+        <!-- Welcome Empty State -->
+        <div id="welcomeState" style="background:#131926; border:1px dashed #334155; border-radius:12px; padding:2.5rem; text-align:center; margin-top:1rem;">
+          <h3 style="color:#f1f5f9; margin-bottom:0.5rem; font-family:'Outfit',sans-serif;">Ready to find your next favorite title?</h3>
+          <p style="color:#94a3b8; max-width:600px; margin:0 auto 1.5rem auto; font-size:0.9rem;">
+            Tell CineMate what you are in the mood for — mention specific genres, unexpected plot twists, emotional endings, or reference movies like <em>Interstellar</em> or <em>Shutter Island</em>.
+          </p>
+          <div style="display:flex; justify-content:center; gap:8px; flex-wrap:wrap;">
+            <span class="taste-chip">✨ Mind-bending Sci-Fi</span>
+            <span class="taste-chip">🍿 Weekend Binge Series</span>
+            <span class="taste-chip">🇮🇳 Indian Suspense Dramas</span>
+            <span class="taste-chip">❤️ Heartwarming Rom-Coms</span>
+          </div>
         </div>
       </div>
-    </section>
 
-    <!-- Notice Box -->
-    <div id="noticeBox" class="alert-notice" style="display: none;"></div>
+      <!-- Watchlist Tab View -->
+      <div id="watchlistView" style="display: none;">
+        <h2 style="font-family:'Outfit',sans-serif; font-size:1.6rem; margin-bottom:0.3rem;">🔖 Your Personal Watchlist</h2>
+        <div style="font-size:0.85rem; color:#94a3b8; margin-bottom:1.5rem;">Saved titles persist locally in your browser storage.</div>
 
-    <!-- Spinner -->
-    <div id="spinner" class="spinner-container">
-      <div class="spinner"></div>
-      <p style="color: var(--text-muted); font-size: 0.95rem;">Analyzing preferences and scoring candidate titles...</p>
-    </div>
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:1.5rem;">
+          <label style="font-size:0.85rem; color:#cbd5e1;">Filter Watchlist By:</label>
+          <select id="watchlistFilter" class="genre-select" style="max-width:200px;">
+            <option value="all">All Titles</option>
+            <option value="movie">Movies Only</option>
+            <option value="tv">TV Series Only</option>
+          </select>
+        </div>
 
-    <!-- Recommendations Section -->
-    <section id="resultsSection" style="display: none;">
-      <div class="section-header">
-        <h2 id="resultsHeading" class="section-title">🎯 Top Recommendations</h2>
-        <span id="resultsCount" style="color: var(--text-muted); font-size: 0.88rem;"></span>
+        <div id="watchlistContent" class="watchlist-list"></div>
       </div>
-      <div id="cardsGrid" class="grid"></div>
-    </section>
-
-    <!-- Empty State -->
-    <section id="emptyState" class="empty-state">
-      <h3>Ready to discover something extraordinary?</h3>
-      <p>Type any natural-language request or click one of the suggestion chips above. CineMate tracks your conversation so you can refine with follow-ups like <em>"Only Indian ones"</em> or <em>"Released after 2020"</em>.</p>
-    </section>
-  </div>
-
-  <!-- Watchlist Drawer -->
-  <div id="drawerOverlay" class="drawer-overlay"></div>
-  <div id="drawer" class="drawer">
-    <div class="drawer-header">
-      <div class="drawer-title">🔖 Saved Watchlist</div>
-      <button id="closeDrawerBtn" class="btn-close-drawer">&times;</button>
-    </div>
-    <div id="drawerList" class="drawer-content"></div>
+    </main>
   </div>
 
   <script>
-    // State management
+    // State
     let activePreferences = null;
     let watchlist = JSON.parse(localStorage.getItem('cinemate_watchlist') || '[]');
 
-    // DOM Elements
-    const searchInput = document.getElementById('searchInput');
-    const searchBtn = document.getElementById('searchBtn');
+    // Elements
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
     const spinner = document.getElementById('spinner');
-    const resultsSection = document.getElementById('resultsSection');
+    const recommendationsSection = document.getElementById('recommendationsSection');
     const cardsGrid = document.getElementById('cardsGrid');
-    const emptyState = document.getElementById('emptyState');
-    const noticeBox = document.getElementById('noticeBox');
-    const memoryBox = document.getElementById('memoryBox');
-    const memoryChips = document.getElementById('memoryChips');
-    const resetMemoryBtn = document.getElementById('resetMemoryBtn');
+    const welcomeState = document.getElementById('welcomeState');
+    const memoryProfileSection = document.getElementById('memoryProfileSection');
+    const memoryChipsList = document.getElementById('memoryChipsList');
+    const tabDiscoverBtn = document.getElementById('tabDiscoverBtn');
+    const tabWatchlistBtn = document.getElementById('tabWatchlistBtn');
+    const discoverView = document.getElementById('discoverView');
+    const watchlistView = document.getElementById('watchlistView');
+    const watchlistContent = document.getElementById('watchlistContent');
+    const watchlistFilter = document.getElementById('watchlistFilter');
+    const sideWatchCount = document.getElementById('sideWatchCount');
+    const tabWatchCount = document.getElementById('tabWatchCount');
+    const resetProfileBtn = document.getElementById('resetProfileBtn');
     const statusBadge = document.getElementById('statusBadge');
-    const watchlistCountBadge = document.getElementById('watchlistCountBadge');
-    const drawerOverlay = document.getElementById('drawerOverlay');
-    const drawer = document.getElementById('drawer');
-    const drawerList = document.getElementById('drawerList');
-    const openWatchlistBtn = document.getElementById('openWatchlistBtn');
-    const closeDrawerBtn = document.getElementById('closeDrawerBtn');
 
-    // Update Watchlist UI counter
-    function updateWatchlistCounter() {
-      watchlistCountBadge.textContent = watchlist.length;
+    // Sidebar Sliders
+    const ratingSlider = document.getElementById('ratingSlider');
+    const ratingVal = document.getElementById('ratingVal');
+    ratingSlider.addEventListener('input', (e) => { ratingVal.textContent = e.target.value; });
+
+    const yearSlider = document.getElementById('yearSlider');
+    const yearVal = document.getElementById('yearVal');
+    yearSlider.addEventListener('input', (e) => { yearVal.textContent = e.target.value; });
+
+    const runtimeSlider = document.getElementById('runtimeSlider');
+    const runtimeVal = document.getElementById('runtimeVal');
+    runtimeSlider.addEventListener('input', (e) => { runtimeVal.textContent = e.target.value + 'm'; });
+
+    // Update Watchlist Badges
+    function updateWatchlistCounts() {
+      sideWatchCount.textContent = watchlist.length;
+      tabWatchCount.textContent = watchlist.length;
     }
-    updateWatchlistCounter();
+    updateWatchlistCounts();
 
-    // Check Backend Health
-    async function checkHealth() {
+    // Health check
+    async function initHealth() {
       try {
         const res = await fetch('/api/health');
         if (res.ok) {
-          const data = await res.json();
-          if (data.is_demo_mode) {
-            statusBadge.className = 'status-badge demo';
-            statusBadge.textContent = '🟣 Demo Mode (' + data.catalog_size + ' titles)';
-          } else {
-            statusBadge.className = 'status-badge live';
-            statusBadge.textContent = '🟢 Live TMDB & Gemini';
+          const d = await res.json();
+          if (!d.is_demo_mode) {
+            statusBadge.className = 'status-pill-live';
+            statusBadge.textContent = '🟢 Live TMDB & Gemini Active';
           }
         }
-      } catch (e) {
-        // Fallback demo badge
-        statusBadge.textContent = '🟣 Demo Mode';
-      }
+      } catch (e) {}
     }
-    checkHealth();
+    initHealth();
 
-    // Perform Recommendation Request
+    // Tab Switching
+    tabDiscoverBtn.addEventListener('click', () => {
+      tabDiscoverBtn.classList.add('active');
+      tabWatchlistBtn.classList.remove('active');
+      discoverView.style.display = 'block';
+      watchlistView.style.display = 'none';
+    });
+
+    tabWatchlistBtn.addEventListener('click', () => {
+      tabWatchlistBtn.classList.add('active');
+      tabDiscoverBtn.classList.remove('active');
+      discoverView.style.display = 'none';
+      watchlistView.style.display = 'block';
+      renderWatchlistPage();
+    });
+
+    // Execute Search
     async function executeSearch(query) {
       if (!query || !query.trim()) return;
 
       spinner.style.display = 'block';
-      resultsSection.style.display = 'none';
-      emptyState.style.display = 'none';
-      noticeBox.style.display = 'none';
+      recommendationsSection.style.display = 'none';
+      welcomeState.style.display = 'none';
+
+      // Attach current sidebar filters to request
+      const contentType = document.querySelector('input[name="contentType"]:checked').value;
+      const genre = document.getElementById('genreSelect').value;
+      const minRating = parseFloat(ratingSlider.value);
+      const minYear = parseInt(yearSlider.value);
+      const maxRuntime = parseInt(runtimeSlider.value);
+
+      const prefs = activePreferences || {};
+      if (contentType !== 'both') prefs.content_type = contentType;
+      if (genre) prefs.genres = [genre];
+      if (minRating > 0) prefs.min_rating = minRating;
+      if (minYear > 1980) prefs.min_year = minYear;
+      if (maxRuntime < 240) prefs.max_runtime = maxRuntime;
 
       try {
-        const payload = {
-          query: query.trim(),
-          preferences: activePreferences
-        };
-
-        const response = await fetch('/api/recommend', {
+        const res = await fetch('/api/recommend', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify({ query: query.trim(), preferences: prefs })
         });
-
-        const data = await response.json();
+        const data = await res.json();
         spinner.style.display = 'none';
 
         if (data.success && data.recommendations) {
           activePreferences = data.preferences;
           renderMemoryChips(data.summary_chips || []);
           renderCards(data.recommendations);
-          
-          if (data.relaxation_notice) {
-            noticeBox.textContent = data.relaxation_notice;
-            noticeBox.style.display = 'block';
-          }
-
-          resultsSection.style.display = 'block';
-          document.getElementById('resultsCount').textContent = `${data.recommendations.length} curated matches`;
+          recommendationsSection.style.display = 'block';
+          document.getElementById('recommendationsHeading').textContent = `🎯 Top Recommendations (${data.recommendations.length} matches)`;
         } else {
           alert(data.error || "Failed to fetch recommendations.");
-          emptyState.style.display = 'block';
+          welcomeState.style.display = 'block';
         }
       } catch (err) {
         spinner.style.display = 'none';
-        emptyState.style.display = 'block';
-        alert("Network error connecting to CineMate API: " + err.message);
+        welcomeState.style.display = 'block';
+        alert("Error: " + err.message);
       }
     }
 
-    // Render Active Taste Memory Chips
+    // Render Memory Chips
     function renderMemoryChips(chips) {
       if (!chips || chips.length === 0) {
-        memoryBox.style.display = 'none';
+        memoryProfileSection.style.display = 'none';
         return;
       }
-      memoryChips.innerHTML = chips.map(c => `<span class="taste-pill">${c}</span>`).join('');
-      memoryBox.style.display = 'flex';
+      memoryChipsList.innerHTML = chips.map(c => `<span class="taste-chip">${c}</span>`).join('');
+      memoryProfileSection.style.display = 'block';
     }
 
-    // Render Movie / TV Cards
+    // Render Cards in 3-Column Grid (Exact Streamlit Structure)
     function renderCards(items) {
       cardsGrid.innerHTML = '';
-      items.forEach(item => {
+      items.forEach((item, idx) => {
         const isMovie = item.media_type === 'movie';
         const typeBadge = isMovie ? 'Movie' : 'TV Series';
         const ratingStr = item.rating ? `★ ${item.rating}/10` : '★ Not rated';
@@ -902,19 +934,17 @@
         const inWatchlist = watchlist.some(w => w.id === item.id);
 
         const card = document.createElement('div');
-        card.className = 'card';
+        card.className = 'movie-card';
 
-        const posterHtml = item.poster_path 
-          ? `<img src="${item.poster_path}" class="poster-img" alt="${item.title}" loading="lazy" />`
-          : `<div class="poster-fallback"><span>🎬</span><strong style="margin-top:8px;">${item.title}</strong><small style="margin-top:4px;">Poster not available</small></div>`;
+        const posterHtml = item.poster_path
+          ? `<img src="${item.poster_path}" class="poster-img" alt="${item.title}" loading="lazy">`
+          : `<div class="poster-placeholder"><span>🎬</span><br><strong>${item.title}</strong><br><small>Poster not available</small></div>`;
 
-        const genresHtml = (item.genres || []).slice(0, 3).map(g => `<span class="genre-pill">${g}</span>`).join('');
+        const genresHtml = (item.genres || []).slice(0, 3).map(g => `<span class="genre-chip">${g}</span>`).join('');
 
         card.innerHTML = `
-          <div class="poster-container">
-            ${posterHtml}
-          </div>
-          <div class="card-body">
+          ${posterHtml}
+          <div class="card-content">
             <div class="card-title">${item.title}</div>
             <div class="card-meta">
               <span class="badge-type">${typeBadge}</span>
@@ -924,35 +954,70 @@
               <span>• ${langStr}</span>
               <span>• ${runtimeStr}</span>
             </div>
-            <div class="genre-chips">${genresHtml}</div>
+            <div style="margin-bottom: 0.6rem;">${genresHtml}</div>
             <div class="card-overview">${item.overview || 'Overview not available.'}</div>
             <div class="why-match-box">
               💡 <strong>Why this matches you:</strong><br>
-              ${item.ai_explanation || 'Curated to match your preferences.'}
+              ${item.ai_explanation || 'Curated according to your tastes.'}
             </div>
-            <div class="card-footer">
-              <button class="btn-card btn-card-watchlist ${inWatchlist ? 'active' : ''}" data-id="${item.id}">
+            <div class="card-actions">
+              <button class="btn-action btn-watch ${inWatchlist ? 'active' : ''}" data-id="${item.id}">
                 ${inWatchlist ? '✓ In Watchlist' : '+ Watchlist'}
               </button>
-              ${item.tmdb_url ? `<a href="${item.tmdb_url}" target="_blank" rel="noopener noreferrer" class="btn-card btn-card-tmdb">TMDB ↗</a>` : ''}
+              ${item.tmdb_url ? `<a href="${item.tmdb_url}" target="_blank" rel="noopener noreferrer" class="btn-action btn-tmdb">TMDB Info ↗</a>` : ''}
+            </div>
+            <div class="expander">
+              <div class="expander-header">
+                <span>🔍 Similar to ${item.title}</span>
+                <span>▼</span>
+              </div>
+              <div class="expander-body" id="similar-body-${item.id}">
+                <div style="color:#94a3b8;">Loading similar titles...</div>
+              </div>
             </div>
           </div>
         `;
 
         // Watchlist toggle handler
-        const watchBtn = card.querySelector('.btn-card-watchlist');
+        const watchBtn = card.querySelector('.btn-watch');
         watchBtn.addEventListener('click', () => {
           toggleWatchlist(item);
-          const nowIn = watchlist.some(w => w.id === item.id);
-          watchBtn.className = `btn-card btn-card-watchlist ${nowIn ? 'active' : ''}`;
-          watchBtn.textContent = nowIn ? '✓ In Watchlist' : '+ Watchlist';
+          const isNowIn = watchlist.some(w => w.id === item.id);
+          watchBtn.className = `btn-action btn-watch ${isNowIn ? 'active' : ''}`;
+          watchBtn.textContent = isNowIn ? '✓ In Watchlist' : '+ Watchlist';
+        });
+
+        // Expander handler
+        const expander = card.querySelector('.expander');
+        const header = card.querySelector('.expander-header');
+        header.addEventListener('click', async () => {
+          expander.classList.toggle('open');
+          if (expander.classList.contains('open')) {
+            const body = document.getElementById(`similar-body-${item.id}`);
+            try {
+              const sRes = await fetch(`/api/similar?id=${item.id}&media_type=${item.media_type}`);
+              const sData = await sRes.json();
+              if (sData.success && sData.similar_titles.length) {
+                body.innerHTML = sData.similar_titles.map(s => `
+                  <div style="margin-bottom:6px;">
+                    <strong>${s.title}</strong> (${s.release_year || 'N/A'}) • ★ ${s.rating || 'N/A'}/10
+                    <div style="color:#64748b; font-size:0.73rem;">${(s.overview || '').slice(0, 100)}...</div>
+                  </div>
+                `).join('');
+              } else {
+                body.innerHTML = '<div>No similar titles found.</div>';
+              }
+            } catch (e) {
+              body.innerHTML = '<div>Unable to load similar titles.</div>';
+            }
+          }
         });
 
         cardsGrid.appendChild(card);
       });
     }
 
-    // Toggle Watchlist
+    // Watchlist functions
     function toggleWatchlist(item) {
       const idx = watchlist.findIndex(w => w.id === item.id);
       if (idx >= 0) {
@@ -964,92 +1029,85 @@
           media_type: item.media_type,
           release_year: item.release_year,
           rating: item.rating,
+          genres: item.genres,
           poster_path: item.poster_path,
-          overview: item.overview
+          overview: item.overview,
+          tmdb_url: item.tmdb_url
         });
       }
       localStorage.setItem('cinemate_watchlist', JSON.stringify(watchlist));
-      updateWatchlistCounter();
-      renderWatchlistDrawer();
+      updateWatchlistCounts();
     }
 
-    // Render Watchlist in Drawer
-    function renderWatchlistDrawer() {
-      if (watchlist.length === 0) {
-        drawerList.innerHTML = `
-          <div style="text-align: center; color: var(--text-muted); padding: 3rem 1rem;">
-            <p>Your watchlist is currently empty.</p>
-            <p style="font-size: 0.85rem; margin-top: 6px;">Click <strong>+ Watchlist</strong> on any title to save it here.</p>
+    function renderWatchlistPage() {
+      const filter = watchlistFilter.value;
+      let filtered = watchlist;
+      if (filter !== 'all') {
+        filtered = watchlist.filter(w => w.media_type === filter);
+      }
+
+      if (filtered.length === 0) {
+        watchlistContent.innerHTML = `
+          <div style="background:#131926; border:1px dashed #334155; border-radius:12px; padding:3rem; text-align:center;">
+            <h4 style="font-family:'Outfit',sans-serif; margin-bottom:4px;">Your watchlist is empty</h4>
+            <p style="color:#94a3b8; font-size:0.9rem;">Discover titles and click <strong>+ Watchlist</strong> to save them here.</p>
           </div>
         `;
         return;
       }
 
-      drawerList.innerHTML = watchlist.map(item => `
-        <div class="watchlist-item">
-          ${item.poster_path ? `<img src="${item.poster_path}" class="watchlist-thumb" alt="${item.title}" />` : `<div class="watchlist-thumb" style="display:flex;align-items:center;justify-content:center;color:#64748b;">🎬</div>`}
-          <div class="watchlist-item-info">
-            <div class="watchlist-item-title">${item.title}</div>
-            <div class="watchlist-item-meta">${item.media_type === 'movie' ? 'Movie' : 'TV Series'} • ${item.release_year || 'N/A'} • ★ ${item.rating || 'N/A'}</div>
-            <button class="btn-remove-watch" onclick="removeFromWatchlist(${item.id})">Remove</button>
+      watchlistContent.innerHTML = filtered.map(item => `
+        <div class="watchlist-row">
+          ${item.poster_path ? `<img src="${item.poster_path}" alt="${item.title}">` : `<div style="width:60px; height:85px; background:#1e293b; display:flex; align-items:center; justify-content:center;">🎬</div>`}
+          <div class="watchlist-details">
+            <h4 style="font-family:'Outfit',sans-serif; font-size:1.1rem; color:#fff;">${item.title} (${item.release_year || 'N/A'})</h4>
+            <div style="font-size:0.8rem; color:#94a3b8; margin: 2px 0 6px 0;">
+              <span class="badge-type">${item.media_type === 'movie' ? 'Movie' : 'TV Series'}</span>
+              <span class="badge-rating">★ ${item.rating || 'N/A'}/10</span>
+              ${item.genres ? `• 🎭 ${item.genres.join(', ')}` : ''}
+            </div>
+            <div style="font-size:0.82rem; color:#94a3b8; line-height:1.4;">${(item.overview || '').slice(0, 180)}...</div>
+            ${item.tmdb_url ? `<a href="${item.tmdb_url}" target="_blank" style="font-size:0.8rem; color:#818cf8; text-decoration:none; display:inline-block; margin-top:4px;">View on TMDB ↗</a>` : ''}
           </div>
+          <button class="btn-remove-row" onclick="removeWatchItem(${item.id})">🗑️ Remove</button>
         </div>
       `).join('');
     }
 
-    window.removeFromWatchlist = function(id) {
+    window.removeWatchItem = function(id) {
       watchlist = watchlist.filter(w => w.id !== id);
       localStorage.setItem('cinemate_watchlist', JSON.stringify(watchlist));
-      updateWatchlistCounter();
-      renderWatchlistDrawer();
-      // Update button on card if visible
-      const btn = document.querySelector(`.btn-card-watchlist[data-id="${id}"]`);
-      if (btn) {
-        btn.className = 'btn-card btn-card-watchlist';
-        btn.textContent = '+ Watchlist';
-      }
+      updateWatchlistCounts();
+      renderWatchlistPage();
     };
 
-    // Watchlist Drawer Events
-    openWatchlistBtn.addEventListener('click', () => {
-      renderWatchlistDrawer();
-      drawer.classList.add('open');
-      drawerOverlay.classList.add('open');
-    });
+    watchlistFilter.addEventListener('change', renderWatchlistPage);
 
-    closeDrawerBtn.addEventListener('click', () => {
-      drawer.classList.remove('open');
-      drawerOverlay.classList.remove('open');
-    });
-
-    drawerOverlay.addEventListener('click', () => {
-      drawer.classList.remove('open');
-      drawerOverlay.classList.remove('open');
-    });
-
-    // Reset Memory Handler
-    resetMemoryBtn.addEventListener('click', () => {
+    // Reset Taste Profile
+    resetProfileBtn.addEventListener('click', () => {
       activePreferences = null;
       renderMemoryChips([]);
+      document.querySelector('input[name="contentType"][value="both"]').checked = true;
+      document.getElementById('genreSelect').value = '';
+      ratingSlider.value = 6.5; ratingVal.textContent = '6.5';
+      yearSlider.value = 1990; yearVal.textContent = '1990';
+      runtimeSlider.value = 180; runtimeVal.textContent = '180m';
+      recommendationsSection.style.display = 'none';
+      welcomeState.style.display = 'block';
     });
 
-    // Search Events
-    searchBtn.addEventListener('click', () => {
-      executeSearch(searchInput.value);
+    // Search Handlers
+    sendBtn.addEventListener('click', () => { executeSearch(chatInput.value); });
+    chatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') executeSearch(chatInput.value);
     });
 
-    searchInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        executeSearch(searchInput.value);
-      }
-    });
-
-    // Quick Prompt Chips Click
-    document.querySelectorAll('.prompt-chip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        const query = chip.getAttribute('data-query');
-        searchInput.value = query;
-        executeSearch(query);
+    // Prompt Click Handlers
+    document.querySelectorAll('.btn-prompt').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const q = btn.getAttribute('data-q');
+        chatInput.value = q;
+        executeSearch(q);
       });
     });
   </script>
